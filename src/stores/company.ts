@@ -13,7 +13,8 @@ export const useCompanyStore = defineStore('company', {
     paginacao: new Paginacao(0, 0, 0, 0, false),
     selecionada: new Company(),
     filtro: new CompanyFiltro(),
-    parametros: ''
+    parametros: '',
+    url: 'http://localhost:8080'
   }),
 
   getters: {
@@ -30,7 +31,7 @@ export const useCompanyStore = defineStore('company', {
     salvar(companies: Company) {
       return new Promise<void>((resolve, reject) => {
         axios
-          .post('/api/companies', companies)
+          .post(this.url + '/companies', companies)
           .then(data => {
             this.SAVE_COMPANY(data.data as Company);
             Notify.create({
@@ -55,7 +56,7 @@ export const useCompanyStore = defineStore('company', {
 
           return new Promise<void>((resolve, reject) => {
             axios
-              .delete(`/api/companies/${company.id}`)
+              .delete(this.url + `/companies/${company.id}`)
               .then(() => {
                 const indexToRemove = this.registros.findIndex(item => item.id === company.id);
                 if (indexToRemove !== -1) {
@@ -84,8 +85,9 @@ export const useCompanyStore = defineStore('company', {
 
       return new Promise<void>((resolve, reject) => {
         axios
-          .get('/api/companies', { params })
+          .get(this.url + '/companies')
           .then(data => {
+            console.log(data)
             this.SET_TIPOS_CUSTO(data.data as Company[]);
             resolve();
           })
@@ -103,7 +105,7 @@ export const useCompanyStore = defineStore('company', {
     pesquisarId(id: string) {
       return new Promise<void>((resolve, reject) => {
         axios
-          .get(`/api/companies/${id}`)
+          .get(this.url + `/companies/${id}`)
           .then(data => {
             this.SET_COMPANY(data.data as Company);
             resolve();
@@ -128,7 +130,7 @@ export const useCompanyStore = defineStore('company', {
 
       return new Promise<void>((resolve, reject) => {
         axios
-          .get('/api/companies', { params })
+          .get(this.url + '/companies', { params })
           .then(data => {
             this.ADD_TIPOS_CUSTO(data.data);
             resolve();
@@ -175,7 +177,7 @@ export const useCompanyStore = defineStore('company', {
       this.paginacao.registrosCarregados = payload.numberOfElements as number;
       this.paginacao.totalRegistros = payload.totalElements as number;
       this.paginacao.ultima = payload.last as boolean;
-      this.registros = payload.content as Company[];
+      this.registros = payload as Company[];
     },
     ADD_TIPOS_CUSTO(payload: any) {
       this.paginacao.paginaAtual = payload.number as number;
